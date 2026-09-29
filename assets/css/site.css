@@ -1,0 +1,259 @@
+/* ============================================================================
+   site.css: Gen Automation's shared chrome, loaded after scrollcraft.css on
+   every page. Brand tokens, the top bar + nav, the mobile drawer, CTAs,
+   page heads, cards, the CTA band and the footer. Page-only styles stay
+   inline in each page.
+   ========================================================================== */
+
+:root {
+  --sc-canvas:      #FDF8F3;
+  --sc-surface:     #F6EEE4;
+  --sc-ink:         #241D16;
+  --sc-ink-soft:    #7A6F62;
+  --sc-accent:      #FF7A59;
+  --sc-accent-ink:  #2A1710;
+  --sc-teal:        #2B6F76;
+
+  --sc-font-display: "Archivo", system-ui, sans-serif;
+  --sc-font-text:    "Manrope", system-ui, sans-serif;
+}
+
+/* body carries --sc-canvas already; html needs it too, or an iOS overscroll
+   strip falls through to the browser's default fill. */
+html { background: var(--sc-canvas); }
+[hidden] { display: none !important; }
+
+/* The engine's scroll-progress bar read as a hard line across the top. */
+[data-sc-progress] { display: none; }
+
+/* Pointer glow: faded near its box's top/bottom so tall sections never show
+   a hard seam, and a touch more solid than the engine's 16% coral. */
+[data-sc-spotlight]::after {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 6rem, black calc(100% - 6rem), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, black 6rem, black calc(100% - 6rem), transparent 100%);
+  background: radial-gradient(
+    28rem 28rem at calc(var(--sc-mx, 0.5) * 100%) calc(var(--sc-my, 0.5) * 100%),
+    color-mix(in oklab, var(--sc-accent) 21%, transparent), transparent 70%);
+}
+
+/* ---- top bar: wordmark · nav links · Book a call ------------------------ */
+.site-bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 70;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sc-5);
+  padding: var(--sc-4) var(--sc-gutter);
+}
+/* Once the page scrolls, content passes under the bar; give it a ground. */
+.site-bar::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: color-mix(in oklab, var(--sc-canvas) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--sc-hairline);
+  opacity: 0; transition: opacity var(--sc-d-base) var(--sc-ease-out);
+}
+.site-bar.is-scrolled::before { opacity: 1; }
+.site-bar__brand { display: inline-flex; align-items: center; gap: var(--sc-3); text-decoration: none; flex: none; }
+.site-bar__icon { width: 2.2rem; height: auto; }
+.site-bar__name {
+  font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-lg);
+  letter-spacing: var(--sc-track-normal); color: var(--sc-ink); white-space: nowrap;
+}
+
+.site-nav { display: flex; align-items: center; gap: clamp(1.25rem, 2.4vw, 2.25rem); }
+.site-nav__link {
+  position: relative;
+  font-family: var(--sc-font-display); font-weight: 600; font-size: var(--sc-t-sm);
+  color: var(--sc-ink); text-decoration: none; padding-block: var(--sc-2);
+}
+.site-nav__link::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--sc-accent); border-radius: 2px;
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--sc-d-base) var(--sc-ease-out);
+}
+.site-nav__link:hover::after, .site-nav__link[aria-current="page"]::after { transform: scaleX(1); }
+.site-nav__link[aria-current="page"] { color: var(--sc-ink); }
+
+.site-bar__right { display: flex; align-items: center; gap: var(--sc-4); flex: none; }
+.site-bar__book {
+  display: inline-flex; align-items: center;
+  padding: 0.6rem 1.15rem; border-radius: 999px;
+  font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-sm);
+  color: var(--sc-accent-ink); background: var(--sc-accent); text-decoration: none; white-space: nowrap;
+  transition: background var(--sc-d-base) var(--sc-ease-out), color var(--sc-d-base) var(--sc-ease-out);
+}
+.site-bar__book:hover { background: var(--sc-accent-ink); color: var(--sc-canvas); }
+.site-bar__book:focus-visible, .site-nav__link:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; }
+
+.site-bar__menu {
+  display: none; flex-direction: column; justify-content: center; align-items: flex-end; gap: 5px;
+  width: 2.6rem; height: 2.6rem;
+  background: none; border: 0; cursor: pointer; padding: 0;
+}
+.site-bar__menu span {
+  display: block; height: 2px; width: 1.5rem; background: var(--sc-ink);
+  transition: transform var(--sc-d-base) var(--sc-ease-out), opacity var(--sc-d-base) var(--sc-ease-out);
+}
+.site-bar__menu[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.site-bar__menu[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.site-bar__menu[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Under 900px the links fold into the drawer; the Book pill stays. */
+@media (max-width: 900px) {
+  .site-nav { display: none; }
+  .site-bar__menu { display: flex; }
+}
+@media (max-width: 380px) {
+  .site-bar__name { font-size: var(--sc-t-base); }
+  .site-bar__book { padding: 0.5rem 0.85rem; }
+  .site-bar__right { gap: var(--sc-3); }
+}
+
+/* ---- mobile drawer ------------------------------------------------------ */
+.site-menu {
+  position: fixed; inset: 0 0 0 auto; z-index: 80;
+  width: min(22rem, 84vw); height: 100%;
+  background: var(--sc-canvas);
+  border-left: 1px solid var(--sc-hairline);
+  padding: clamp(6rem, 18vh, 9rem) var(--sc-7) var(--sc-7);
+  transform: translateX(100%);
+  transition: transform var(--sc-d-slow) var(--sc-ease-drawer);
+}
+.site-menu.is-open { transform: translateX(0); }
+.site-menu__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sc-6); }
+.site-menu__link {
+  font-family: var(--sc-font-display); font-size: var(--sc-t-lg); font-weight: 600;
+  color: var(--sc-ink); text-decoration: none;
+}
+.site-menu__link[aria-current="page"] { color: var(--sc-accent); }
+.site-menu__link--cta { color: var(--sc-accent); }
+.site-menu__scrim {
+  position: fixed; inset: 0; z-index: 75;
+  background: color-mix(in oklab, var(--sc-ink) 35%, transparent);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--sc-d-base) var(--sc-ease-out);
+}
+.site-menu__scrim.is-open { opacity: 1; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .site-menu, .site-menu__scrim, .site-bar__menu span, .site-nav__link::after { transition: none; }
+}
+
+/* ---- CTAs --------------------------------------------------------------- */
+/* Glass CTA (hero): a clipped pill with a conic shimmer glinting across the
+   rim and a slower beam around a dark glass fill. Ink fill, coral glint. */
+.glass-cta {
+  --spread: 90deg; --shimmer: rgba(255, 122, 89, 0.85); --speed: 4s; --cut: 1px;
+  position: relative; isolation: isolate;
+  display: inline-flex; overflow: hidden; border-radius: 999px;
+  text-decoration: none; cursor: pointer;
+  box-shadow: 0 8px 40px rgba(255, 122, 89, 0.3);
+  transition: transform 300ms var(--sc-ease-out), box-shadow 300ms var(--sc-ease-out);
+}
+.glass-cta:hover { transform: scale(1.05); box-shadow: 0 0 40px 8px rgba(255, 122, 89, 0.38); }
+.glass-cta:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+.glass-cta__spin { position: absolute; inset: 0; }
+.glass-cta__cone {
+  position: absolute; left: -200%; top: -200%; width: 400%; height: 400%;
+  background: conic-gradient(from calc(270deg - (var(--spread) * 0.5)), transparent 0, var(--shimmer) var(--spread), transparent var(--spread));
+  animation: glass-cta-spin var(--speed) linear infinite;
+}
+.glass-cta__rim {
+  position: absolute; inset: var(--cut); border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.glass-cta__body {
+  position: relative; z-index: 1; display: flex; align-items: center;
+  padding: 1rem 1.75rem; border-radius: 999px; overflow: hidden;
+  font-family: var(--sc-font-text); font-weight: 600; font-size: 1rem; line-height: 1.5; color: #fff;
+}
+.glass-cta__beam {
+  position: absolute; top: 50%; left: 50%; width: 200%; height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), rgba(255,255,255,0.2), rgba(255,255,255,0.2), rgba(255,255,255,0.2), transparent);
+  transform: translate(-50%, -50%);
+  animation: glass-cta-beam 4s linear infinite;
+}
+.glass-cta__fill {
+  position: absolute; inset: 1px; border-radius: 999px;
+  background: rgba(36, 29, 22, 0.93);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.glass-cta__label { position: relative; white-space: nowrap; }
+@media (min-width: 481px) { .glass-cta__body { padding: 1.125rem 2.25rem; font-size: 1.125rem; } }
+@keyframes glass-cta-spin { to { transform: rotate(360deg); } }
+@keyframes glass-cta-beam {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-cta__cone, .glass-cta__beam { animation: none; }
+  .glass-cta:hover { transform: none; }
+}
+
+/* Solid coral pill. */
+.cta {
+  display: inline-block;
+  padding: var(--sc-5) var(--sc-7); border-radius: 999px;
+  font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-lg);
+  color: var(--sc-accent-ink); background: var(--sc-accent); text-decoration: none;
+  transition: transform var(--sc-d-base) var(--sc-ease-out), background var(--sc-d-base) var(--sc-ease-out), color var(--sc-d-base) var(--sc-ease-out);
+}
+.cta:hover { background: var(--sc-accent-ink); color: var(--sc-canvas); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .cta:hover { transform: none; } }
+
+/* Underlined text link with a coral rule, used for "More →" links. */
+.text-link {
+  font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-sm);
+  color: var(--sc-ink); text-decoration: underline; text-decoration-color: var(--sc-accent);
+  text-decoration-thickness: 2px; text-underline-offset: 0.22em;
+}
+.text-link:hover { color: var(--sc-accent); }
+
+/* ---- page head (subpages) ------------------------------------------------ */
+.page-head { padding-top: clamp(8rem, 20vh, 11rem); padding-bottom: var(--sc-8); }
+.page-head__title { font-size: var(--sc-t-3xl); max-width: 18ch; margin: var(--sc-4) 0 0; }
+.page-head__lede { margin: var(--sc-5) 0 0; max-width: 48ch; font-size: var(--sc-t-lg); color: var(--sc-ink-soft); line-height: 1.5; }
+
+/* ---- section head + cards ----------------------------------------------- */
+.sec-head { max-width: 42rem; margin-bottom: var(--sc-8); }
+.sec-head .sc-display { margin-top: var(--sc-4); }
+.sec-head--center { margin-inline: auto; text-align: center; }
+
+.card {
+  display: flex; flex-direction: column;
+  background: var(--sc-surface);
+  border: 1px solid var(--sc-hairline);
+  border-radius: 1.5rem;
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+}
+.card__tag { margin: 0; font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-sm); color: var(--sc-accent); letter-spacing: var(--sc-track-wide); text-transform: uppercase; }
+.card__title { margin: var(--sc-3) 0 0; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-xl); color: var(--sc-ink); line-height: 1.1; }
+.card__desc { margin: var(--sc-4) 0 0; color: var(--sc-ink); line-height: 1.55; }
+.card__foot { margin-top: auto; padding-top: var(--sc-6); display: flex; flex-wrap: wrap; gap: var(--sc-3) var(--sc-5); }
+
+.ticks { list-style: none; margin: var(--sc-5) 0 0; padding: 0; display: grid; gap: var(--sc-3); }
+.ticks li { position: relative; padding-left: 1.6rem; color: var(--sc-ink-soft); line-height: 1.45; }
+.ticks li::before { content: "→"; position: absolute; left: 0; color: var(--sc-teal); font-weight: 700; }
+.ticks b { color: var(--sc-ink); font-weight: 700; }
+
+/* ---- CTA band (end of subpages) ------------------------------------------ */
+.cta-band { padding-block: clamp(4rem, 8vw, 7rem); }
+.cta-band__card {
+  text-align: center; max-width: 52rem; margin-inline: auto;
+  border: 1px solid var(--sc-hairline); border-radius: 1.5rem;
+  padding: clamp(2.25rem, 5vw, 4rem) var(--sc-6);
+}
+.cta-band__title { font-size: var(--sc-t-2xl); margin: 0; }
+.cta-band__lede { margin: var(--sc-4) auto 0; max-width: 40ch; color: var(--sc-ink-soft); }
+.cta-band .cta { margin-top: var(--sc-7); }
+
+/* ---- footer -------------------------------------------------------------- */
+.site-footer { border-top: 1px solid var(--sc-hairline); padding-block: var(--sc-8) var(--sc-6); }
+.site-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--sc-7); }
+@media (max-width: 700px) { .site-footer__grid { grid-template-columns: 1fr 1fr; } .site-footer__brand { grid-column: 1 / -1; } }
+.site-footer__name { margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-lg); color: var(--sc-ink); }
+.site-footer__tag { margin: var(--sc-3) 0 0; max-width: 28ch; color: var(--sc-ink-soft); }
+.site-footer__h { margin: 0 0 var(--sc-4); font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: var(--sc-track-wide); text-transform: uppercase; color: var(--sc-ink-soft); }
+.site-footer__links { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-3); }
+.site-footer__links a { color: var(--sc-ink); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; }
+.site-footer__links a:hover { color: var(--sc-accent); }
+.site-footer__legal { margin: var(--sc-8) 0 0; color: var(--sc-ink-soft); font-size: var(--sc-t-xs); letter-spacing: var(--sc-track-wide); text-transform: uppercase; }

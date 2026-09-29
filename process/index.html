@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Process · Gen Automation</title>
+<meta name="description" content="How Gen Automation works: discover, design, build and deploy, optimize.">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/gen-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/scrollcraft.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<style>
+  .steps { padding-bottom: var(--sc-7); }
+  .steps__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-6); max-width: 60rem; }
+  .step { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: var(--sc-6); padding-bottom: var(--sc-6); border-bottom: 1px solid var(--sc-hairline); }
+  @media (max-width: 600px) { .step { grid-template-columns: 1fr; gap: var(--sc-3); } }
+  .step__n { margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-2xl); line-height: 1; color: var(--sc-accent); }
+  .step__title { margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-xl); color: var(--sc-ink); line-height: 1.1; }
+  .step__desc { margin: var(--sc-4) 0 0; color: var(--sc-ink); line-height: 1.6; max-width: 58ch; }
+  .step__get { margin: var(--sc-4) 0 0; color: var(--sc-ink-soft); font-size: var(--sc-t-sm); }
+  .step__get b { color: var(--sc-ink); }
+
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="/">
+    <img class="site-bar__icon" src="/assets/brand/gen-icon.svg" alt="">
+    <span class="site-bar__name">Gen Automation</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a class="site-nav__link" data-nav href="/">Home</a>
+    <a class="site-nav__link" data-nav href="/solutions/">Solutions</a>
+    <a class="site-nav__link" data-nav href="/process/">Process</a>
+    <a class="site-nav__link" data-nav href="/about/">About</a>
+    <a class="site-nav__link" data-nav href="/contact/">Contact</a>
+  </nav>
+  <div class="site-bar__right">
+    <a class="site-bar__book" href="/book/">Book a call</a>
+    <button type="button" class="site-bar__menu" id="menuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="site-menu__scrim" id="siteMenuScrim"></div>
+<nav class="site-menu" id="siteMenu" aria-label="Site">
+  <ul class="site-menu__list">
+    <li><a class="site-menu__link" data-nav href="/">Home</a></li>
+    <li><a class="site-menu__link" data-nav href="/solutions/">Solutions</a></li>
+    <li><a class="site-menu__link" data-nav href="/process/">Process</a></li>
+    <li><a class="site-menu__link" data-nav href="/about/">About</a></li>
+    <li><a class="site-menu__link" data-nav href="/contact/">Contact</a></li>
+    <li><a class="site-menu__link site-menu__link--cta" data-nav href="/book/">Book a call</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+  <section class="page-head" data-sc-act="flow" data-sc-drift="#FDF8F3" data-sc-spotlight>
+    <div class="sc-wrap">
+      <p class="sc-label" data-reveal>Process</p>
+      <h1 class="sc-display page-head__title" data-reveal>How it works</h1>
+      <p class="page-head__lede" data-reveal>From first call to a running system, with clear timelines and updates the whole way. You always know what’s being built and why.</p>
+    </div>
+  </section>
+
+  <section class="steps" data-sc-act="flow" data-sc-drift="#FDF8F3">
+    <div class="sc-wrap">
+      <ol class="steps__list">
+        <li class="step" data-reveal>
+          <p class="step__n">01</p>
+          <div>
+            <h2 class="step__title">Discover</h2>
+            <p class="step__desc">A free 30-minute call about how your business runs today: where leads come from, where time goes, and what’s slowing you down. If automation isn’t the answer, we’ll tell you.</p>
+            <p class="step__get"><b>You get:</b> a straight answer on whether it’s worth building, and where to start.</p>
+          </div>
+        </li>
+        <li class="step" data-reveal>
+          <p class="step__n">02</p>
+          <div>
+            <h2 class="step__title">Design</h2>
+            <p class="step__desc">We map your market or your workflow step by step, choose the tools, and decide where a person should stay in the loop.</p>
+            <p class="step__get"><b>You get:</b> a written plan with scope, timeline and a flat project price.</p>
+          </div>
+        </li>
+        <li class="step" data-reveal>
+          <p class="step__n">03</p>
+          <div>
+            <h2 class="step__title">Build and deploy</h2>
+            <p class="step__desc">We build the system inside the tools you already use, test it on real data, and get it running. You get updates as it comes together.</p>
+            <p class="step__get"><b>You get:</b> a working system, an SOP, and a walkthrough video.</p>
+          </div>
+        </li>
+        <li class="step" data-reveal>
+          <p class="step__n">04</p>
+          <div>
+            <h2 class="step__title">Optimize</h2>
+            <p class="step__desc">We measure what it’s doing, tune it, and hand it off finished. It’s yours to run.</p>
+            <p class="step__get"><b>You get:</b> a finished system you own, with the option of ongoing support.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="cta-band" data-sc-act="flow" data-sc-drift="#FDF8F3">
+    <div class="sc-wrap">
+      <div class="cta-band__card" data-reveal>
+        <h2 class="sc-display cta-band__title">Step one takes 30 minutes.</h2>
+        <p class="cta-band__lede">Free, no pressure. You’ll leave knowing whether it’s worth building.</p>
+        <a class="cta" href="/book/" data-sc-magnet="0.22">Book a free 30-minute call</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="sc-wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__name">Gen Automation</p>
+        <p class="site-footer__tag">Grow the business. Without increasing the headcount.</p>
+      </div>
+      <div>
+        <p class="site-footer__h">Pages</p>
+        <ul class="site-footer__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/solutions/">Solutions</a></li>
+          <li><a href="/process/">Process</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__h">Get in touch</p>
+        <ul class="site-footer__links">
+          <li><a href="/book/">Book a call</a></li>
+          <li><a href="mailto:contact@genautomation.co">contact@genautomation.co</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="site-footer__legal">&copy; <span data-year></span> Gen Automation</p>
+  </div>
+</footer>
+
+<script src="/assets/js/scrollcraft.js"></script>
+<script>ScrollCraft.mount(document.body);</script>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

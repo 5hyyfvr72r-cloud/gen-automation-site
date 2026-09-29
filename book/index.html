@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book a call · Gen Automation</title>
+<meta name="description" content="Book a free 30-minute discovery call with Gen Automation — pick a time, get an instant calendar invite.">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/gen-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/scrollcraft.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<style>
+  /* ---- booking page ---- */
+  .book { padding: clamp(7rem, 17vh, 10rem) 0 var(--sc-9); }
+  .book__head { max-width: 42rem; margin-bottom: var(--sc-8); }
+  .book__title { font-size: var(--sc-t-3xl); margin: var(--sc-4) 0 0; }
+  .book__lede { margin-top: var(--sc-5); max-width: 46ch; font-size: var(--sc-t-lg); color: var(--sc-ink-soft); line-height: 1.5; }
+
+  .book__layout { display: grid; gap: var(--sc-8); grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 900px) {
+    .book__layout { grid-template-columns: 1.05fr 1fr; gap: var(--sc-9); }
+  }
+
+  .book__panel-title { font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-base); color: var(--sc-ink); margin: 0 0 var(--sc-5); }
+
+  /* Month calendar, Sunday-first like a US wall calendar. Only weekdays with
+     open times are clickable; the Worker offers Mon-Fri, 9-5 Eastern. */
+  .cal {
+    max-width: 26rem;
+    margin: 0 0 var(--sc-7);
+    padding: var(--sc-5);
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-hairline);
+    border-radius: var(--sc-r-lg);
+  }
+  .cal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sc-4); }
+  .cal__month { margin: 0; font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-lg); color: var(--sc-ink); }
+  .cal__nav { display: flex; gap: var(--sc-2); }
+  .cal__nav-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; padding: 0;
+    border-radius: 50%; border: 1px solid var(--sc-hairline-strong);
+    background: var(--sc-canvas); color: var(--sc-ink); cursor: pointer;
+    transition: border-color var(--sc-d-fast) var(--sc-ease-out), color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .cal__nav-btn svg { width: 1rem; height: 1rem; }
+  .cal__nav-btn:hover:not(:disabled) { border-color: var(--sc-accent); color: var(--sc-accent); }
+  .cal__nav-btn:disabled { opacity: 0.35; cursor: default; }
+  /* minmax(0, 1fr): let columns shrink below their labels' width, or the
+     letter-spaced weekday names hold the grid wider than a small phone. */
+  .cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--sc-1); }
+  .cal__dow {
+    padding-bottom: var(--sc-2); text-align: center;
+    font-size: var(--sc-t-xs); font-weight: 600; letter-spacing: var(--sc-track-wide); text-transform: uppercase;
+    color: var(--sc-ink-soft);
+  }
+  .cal__dow--off { opacity: 0.45; }
+  .cal__day {
+    position: relative; justify-self: center;
+    width: 100%; max-width: 2.75rem; aspect-ratio: 1; padding: 0;
+    border: 0; border-radius: 50%;
+    background: transparent;
+    font-family: var(--sc-font-text); font-weight: 500; font-size: var(--sc-t-sm);
+    color: color-mix(in oklab, var(--sc-ink) 32%, transparent);
+    transition: background var(--sc-d-fast) var(--sc-ease-out), color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .cal__day--weekend { color: color-mix(in oklab, var(--sc-ink) 20%, transparent); }
+  .cal__day--open {
+    font-weight: 700; color: var(--sc-ink); cursor: pointer;
+    background: color-mix(in oklab, var(--sc-accent) 14%, transparent);
+  }
+  .cal__day--open:hover { background: color-mix(in oklab, var(--sc-accent) 28%, transparent); }
+  .cal__day--open[aria-pressed="true"] { background: var(--sc-accent); color: var(--sc-accent-ink); }
+  /* today: a small dot under the number */
+  .cal__day--today::after {
+    content: ""; position: absolute; left: 50%; bottom: 14%;
+    width: 4px; height: 4px; margin-left: -2px; border-radius: 50%;
+    background: currentColor;
+  }
+  .cal__day:focus-visible, .cal__nav-btn:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  /* Very small phones (after the base rules so it wins): single-letter weekdays (S M T W T F S). */
+  @media (max-width: 359px) {
+    .cal { padding: var(--sc-4); }
+    .cal__month { font-size: var(--sc-t-base); }
+    .cal__dow { font-size: 0; letter-spacing: 0; }
+    .cal__dow::after { content: attr(data-short); font-size: var(--sc-t-xs); }
+  }
+
+  .book__tz { font-weight: 400; color: var(--sc-ink-soft); }
+  .slot-date { margin: calc(-1 * var(--sc-3)) 0 var(--sc-4); font-weight: 600; color: var(--sc-ink); }
+
+  .slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: var(--sc-3); }
+  .slot-btn {
+    font-family: var(--sc-font-text);
+    font-weight: 600;
+    font-size: var(--sc-t-sm);
+    color: var(--sc-ink);
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-hairline-strong);
+    border-radius: var(--sc-r-md);
+    padding: var(--sc-3);
+    cursor: pointer;
+    transition: background var(--sc-d-fast) var(--sc-ease-out), color var(--sc-d-fast) var(--sc-ease-out), border-color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .slot-btn[aria-pressed="true"] { background: var(--sc-accent); color: var(--sc-accent-ink); border-color: var(--sc-accent); }
+  .slot-btn:hover { border-color: var(--sc-accent); }
+
+  .book-form { margin-top: var(--sc-2); }
+  .field { display: flex; flex-direction: column; gap: var(--sc-2); margin-bottom: var(--sc-5); }
+  .field label { font-family: var(--sc-font-display); font-weight: 600; font-size: var(--sc-t-sm); color: var(--sc-ink); }
+  .field input, .field textarea {
+    font: inherit;
+    font-family: var(--sc-font-text);
+    padding: var(--sc-4);
+    border-radius: var(--sc-r-md);
+    border: 1px solid var(--sc-hairline-strong);
+    background: var(--sc-surface);
+    color: var(--sc-ink);
+  }
+  .field input:focus, .field textarea:focus { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .field textarea { resize: vertical; min-height: 5rem; }
+
+  .book-form__submit { width: 100%; padding: var(--sc-4) var(--sc-6); text-align: center; border: 0; font-size: var(--sc-t-base); cursor: pointer; }
+  .book-form__submit:disabled { opacity: 0.45; cursor: not-allowed; }
+  .book-form__submit:disabled:hover { background: var(--sc-accent); color: var(--sc-accent-ink); transform: none; }
+
+  .book__status { margin-top: var(--sc-4); font-size: var(--sc-t-sm); color: var(--sc-ink-soft); min-height: 1.4em; }
+  .book__status--error { color: var(--sc-accent-ink); background: color-mix(in oklab, var(--sc-accent) 18%, transparent); padding: var(--sc-3) var(--sc-4); border-radius: var(--sc-r-md); }
+
+  .confirm { text-align: left; }
+  .confirm__title { font-size: var(--sc-t-2xl); margin: var(--sc-4) 0 0; }
+  .confirm p.book__lede { margin-inline: 0; }
+
+</style>
+</head>
+<body>
+
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="/">
+    <img class="site-bar__icon" src="/assets/brand/gen-icon.svg" alt="">
+    <span class="site-bar__name">Gen Automation</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a class="site-nav__link" data-nav href="/">Home</a>
+    <a class="site-nav__link" data-nav href="/solutions/">Solutions</a>
+    <a class="site-nav__link" data-nav href="/process/">Process</a>
+    <a class="site-nav__link" data-nav href="/about/">About</a>
+    <a class="site-nav__link" data-nav href="/contact/">Contact</a>
+  </nav>
+  <div class="site-bar__right">
+    <a class="site-bar__book" href="/book/">Book a call</a>
+    <button type="button" class="site-bar__menu" id="menuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="site-menu__scrim" id="siteMenuScrim"></div>
+<nav class="site-menu" id="siteMenu" aria-label="Site">
+  <ul class="site-menu__list">
+    <li><a class="site-menu__link" data-nav href="/">Home</a></li>
+    <li><a class="site-menu__link" data-nav href="/solutions/">Solutions</a></li>
+    <li><a class="site-menu__link" data-nav href="/process/">Process</a></li>
+    <li><a class="site-menu__link" data-nav href="/about/">About</a></li>
+    <li><a class="site-menu__link" data-nav href="/contact/">Contact</a></li>
+    <li><a class="site-menu__link site-menu__link--cta" data-nav href="/book/">Book a call</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+  <section class="sc-section book" data-sc-spotlight>
+    <div class="sc-wrap">
+
+      <div class="book__head">
+        <p class="sc-label">Book a call</p>
+        <h1 class="sc-display book__title">Grab 30 minutes on the calendar.</h1>
+        <p class="book__lede">Pick a time below and you'll get a calendar invite instantly — no back-and-forth. Free, no pressure, no pitch.</p>
+      </div>
+
+      <div class="book__layout" id="bookLayout">
+        <div class="book__picker">
+          <p class="book__panel-title">1. Choose a day</p>
+          <div class="cal">
+            <div class="cal__head">
+              <p class="cal__month" id="calMonth" aria-live="polite"></p>
+              <div class="cal__nav">
+                <button type="button" class="cal__nav-btn" id="calPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+                <button type="button" class="cal__nav-btn" id="calNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="cal__grid" id="calGrid" role="group" aria-label="Choose a day"></div>
+          </div>
+
+          <p class="book__panel-title">2. Choose a time <span class="book__tz">(US Eastern Time)</span></p>
+          <p class="slot-date" id="slotDate"></p>
+          <div id="slotGrid" class="slot-grid" role="group" aria-label="Choose a time"></div>
+
+          <p id="pickerStatus" class="book__status" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="book__form-panel">
+          <form id="bookForm" class="book-form" novalidate>
+            <p class="book__panel-title">3. Your details</p>
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required autocomplete="name" maxlength="200">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="notes">What's on your mind? (optional)</label>
+              <textarea id="notes" name="notes" maxlength="2000"></textarea>
+            </div>
+            <button type="submit" class="cta book-form__submit" id="submitBtn" disabled>Select a time above</button>
+            <p id="formStatus" class="book__status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="confirm" id="confirm" hidden>
+          <p class="sc-label">Booked</p>
+          <h2 class="sc-display confirm__title">You're on the calendar.</h2>
+          <p class="book__lede" id="confirmDetail"></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="sc-wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__name">Gen Automation</p>
+        <p class="site-footer__tag">Grow the business. Without increasing the headcount.</p>
+      </div>
+      <div>
+        <p class="site-footer__h">Pages</p>
+        <ul class="site-footer__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/solutions/">Solutions</a></li>
+          <li><a href="/process/">Process</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__h">Get in touch</p>
+        <ul class="site-footer__links">
+          <li><a href="/book/">Book a call</a></li>
+          <li><a href="mailto:contact@genautomation.co">contact@genautomation.co</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="site-footer__legal">&copy; <span data-year></span> Gen Automation</p>
+  </div>
+</footer>
+
+
+<script>
+(function () {
+  // Filled in once the Worker is deployed — see worker/wrangler.toml and the
+  // "wrangler deploy" output for the real *.workers.dev URL.
+  var API_BASE = 'https://gen-automation-booking.gen-automation.workers.dev';
+
+  // Every time on this page is shown in US Eastern, the business's own zone
+  // (the Worker offers Mon-Fri, 9-5 Eastern). The invite itself lands in each
+  // attendee's calendar in their own zone.
+  var TZ = 'America/New_York';
+
+  var calMonthEl = document.getElementById('calMonth');
+  var calGridEl = document.getElementById('calGrid');
+  var calPrevEl = document.getElementById('calPrev');
+  var calNextEl = document.getElementById('calNext');
+  var slotDateEl = document.getElementById('slotDate');
+  var slotGridEl = document.getElementById('slotGrid');
+  var pickerStatusEl = document.getElementById('pickerStatus');
+  var formEl = document.getElementById('bookForm');
+  var formStatusEl = document.getElementById('formStatus');
+  var submitBtn = document.getElementById('submitBtn');
+  var layoutEl = document.getElementById('bookLayout');
+  var confirmEl = document.getElementById('confirm');
+  var confirmDetailEl = document.getElementById('confirmDetail');
+
+  var keyFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' });
+  var timeFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+  var shortFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  var longFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  // Calendar cells are plain dates, so they're formatted at UTC noon to keep
+  // the viewer's own zone out of the date math.
+  var dayNameFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
+  var monthFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'long', year: 'numeric' });
+
+  var slotsByDay = {}; // 'YYYY-MM-DD' (Eastern) -> [{start,end}]
+  var dayOrder = [];
+  var selectedDay = null;
+  var selectedSlot = null; // {start, end}
+  var todayKey, viewYM, minYM, maxYM; // months as year * 12 + monthIndex
+
+  function keyOf(date) {
+    var p = {};
+    keyFmt.formatToParts(date).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + '-' + p.month + '-' + p.day;
+  }
+  function keyToDate(key) { return new Date(key + 'T12:00:00Z'); }
+  function ymOf(key) { return Number(key.slice(0, 4)) * 12 + Number(key.slice(5, 7)) - 1; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function setStatus(el, msg, isError) {
+    el.textContent = msg || '';
+    el.classList.toggle('book__status--error', !!isError);
+  }
+
+  function renderCalendar() {
+    var y = Math.floor(viewYM / 12), m = viewYM % 12;
+    calMonthEl.textContent = monthFmt.format(new Date(Date.UTC(y, m, 1, 12)));
+    var first = new Date(Date.UTC(y, m, 1)).getUTCDay(); // 0 = Sunday
+    var count = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+
+    calGridEl.innerHTML = '';
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(function (name, i) {
+      var h = document.createElement('span');
+      h.className = 'cal__dow' + (i === 0 || i === 6 ? ' cal__dow--off' : '');
+      h.setAttribute('aria-hidden', 'true');
+      h.setAttribute('data-short', name.charAt(0));
+      h.textContent = name;
+      calGridEl.appendChild(h);
+    });
+    for (var b = 0; b < first; b++) {
+      var blank = document.createElement('span');
+      blank.setAttribute('aria-hidden', 'true');
+      calGridEl.appendChild(blank);
+    }
+    for (var d = 1; d <= count; d++) {
+      var key = y + '-' + pad(m + 1) + '-' + pad(d);
+      var dow = (first + d - 1) % 7;
+      var slots = slotsByDay[key];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cal__day' +
+        (slots ? ' cal__day--open' : '') +
+        (dow === 0 || dow === 6 ? ' cal__day--weekend' : '') +
+        (key === todayKey ? ' cal__day--today' : '');
+      btn.textContent = d;
+      var label = dayNameFmt.format(keyToDate(key));
+      if (slots) {
+        btn.setAttribute('aria-pressed', String(key === selectedDay));
+        btn.setAttribute('aria-label', label + ', ' + slots.length + (slots.length === 1 ? ' open time' : ' open times'));
+        btn.addEventListener('click', pickDay.bind(null, key));
+      } else {
+        btn.disabled = true;
+        btn.setAttribute('aria-label', label + ', unavailable');
+      }
+      calGridEl.appendChild(btn);
+    }
+    calPrevEl.disabled = viewYM <= minYM;
+    calNextEl.disabled = viewYM >= maxYM;
+  }
+
+  function pickDay(key) {
+    selectedDay = key;
+    selectedSlot = null;
+    renderCalendar();
+    renderSlots();
+    updateSubmitState();
+  }
+
+  calPrevEl.addEventListener('click', function () { if (viewYM > minYM) { viewYM--; renderCalendar(); } });
+  calNextEl.addEventListener('click', function () { if (viewYM < maxYM) { viewYM++; renderCalendar(); } });
+
+  function renderSlots() {
+    slotGridEl.innerHTML = '';
+    slotDateEl.textContent = selectedDay ? dayNameFmt.format(keyToDate(selectedDay)) : '';
+    if (!selectedDay) return;
+    var slots = slotsByDay[selectedDay] || [];
+    if (slots.length === 0) {
+      setStatus(pickerStatusEl, 'No open times that day — try another.', false);
+      return;
+    }
+    setStatus(pickerStatusEl, '', false);
+    slots.forEach(function (slot) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-btn';
+      var isSelected = selectedSlot && selectedSlot.start === slot.start;
+      btn.setAttribute('aria-pressed', String(!!isSelected));
+      btn.textContent = timeFmt.format(new Date(slot.start));
+      btn.addEventListener('click', function () {
+        selectedSlot = slot;
+        renderSlots();
+        updateSubmitState();
+      });
+      slotGridEl.appendChild(btn);
+    });
+  }
+
+  function updateSubmitState() {
+    if (selectedSlot) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Book ' + shortFmt.format(new Date(selectedSlot.start)) + ' ET';
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Select a time above';
+    }
+  }
+
+  function loadAvailability() {
+    setStatus(pickerStatusEl, 'Loading open times…', false);
+    fetch(API_BASE + '/api/availability?days=30')
+      .then(function (res) {
+        if (!res.ok) throw new Error('availability request failed');
+        return res.json();
+      })
+      .then(function (data) {
+        slotsByDay = {};
+        dayOrder = [];
+        (data.slots || []).forEach(function (slot) {
+          var key = keyOf(new Date(slot.start));
+          if (!slotsByDay[key]) {
+            slotsByDay[key] = [];
+            dayOrder.push(key);
+          }
+          slotsByDay[key].push(slot);
+        });
+        dayOrder.sort();
+
+        todayKey = keyOf(new Date());
+        minYM = ymOf(todayKey);
+        maxYM = dayOrder.length ? Math.max(minYM, ymOf(dayOrder[dayOrder.length - 1])) : minYM;
+
+        // A slot that vanished (e.g. just taken by someone else) can't stay selected.
+        if (selectedSlot && !(slotsByDay[keyOf(new Date(selectedSlot.start))] || []).some(function (s) { return s.start === selectedSlot.start; })) {
+          selectedSlot = null;
+        }
+
+        if (dayOrder.length === 0) {
+          selectedDay = null;
+          viewYM = minYM;
+          renderCalendar();
+          renderSlots();
+          updateSubmitState();
+          setStatus(pickerStatusEl, 'No open times in the next 30 days — email contact@genautomation.co directly.', true);
+          return;
+        }
+        if (!selectedDay || !slotsByDay[selectedDay]) selectedDay = dayOrder[0];
+        viewYM = ymOf(selectedDay);
+        setStatus(pickerStatusEl, '', false);
+        renderCalendar();
+        renderSlots();
+        updateSubmitState();
+      })
+      .catch(function () {
+        setStatus(pickerStatusEl, "Couldn't load availability right now — email contact@genautomation.co directly.", true);
+      });
+  }
+
+  // Draw this month's grid right away (all dates inactive) so the layout
+  // doesn't jump while open times load.
+  todayKey = keyOf(new Date());
+  minYM = maxYM = viewYM = ymOf(todayKey);
+  renderCalendar();
+
+  formEl.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!selectedSlot) return;
+
+    var name = formEl.name.value.trim();
+    var email = formEl.email.value.trim();
+    var notes = formEl.notes.value.trim();
+
+    if (!name || !email) {
+      setStatus(formStatusEl, 'Name and email are required.', true);
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Booking…';
+    setStatus(formStatusEl, '', false);
+
+    fetch(API_BASE + '/api/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start: selectedSlot.start,
+        end: selectedSlot.end,
+        name: name,
+        email: email,
+        notes: notes
+      })
+    })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        if (!result.ok || !result.data.ok) {
+          setStatus(formStatusEl, (result.data && result.data.error) || 'Something went wrong — please try again.', true);
+          submitBtn.disabled = false;
+          updateSubmitState();
+          // slot may have just been taken — refresh availability
+          loadAvailability();
+          return;
+        }
+        layoutEl.querySelectorAll('.book__picker, .book__form-panel').forEach(function (el) { el.hidden = true; });
+        confirmDetailEl.textContent =
+          'A calendar invite for ' + longFmt.format(new Date(selectedSlot.start)) + ' ET is on its way to ' + email + '.';
+        confirmEl.hidden = false;
+      })
+      .catch(function () {
+        setStatus(formStatusEl, "Couldn't reach the booking system — email contact@genautomation.co directly.", true);
+        submitBtn.disabled = false;
+        updateSubmitState();
+      });
+  });
+
+  loadAvailability();
+})();
+</script>
+
+<script>
+(function () {
+  // Cursor glow, same as the homepage. This page doesn't load the scroll
+  // engine, so aim it here: follow the mouse, and stay under a still cursor
+  // while the page scrolls. Mouse only, and off under reduced motion (the
+  // shared CSS hides the glow there too).
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  var spots = document.querySelectorAll('[data-sc-spotlight]');
+  if (!spots.length) return;
+  var x = null, y = null, queued = false;
+  function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
+  function aim() {
+    queued = false;
+    if (x === null) return;
+    for (var i = 0; i < spots.length; i++) {
+      var r = spots[i].getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) continue;
+      spots[i].style.setProperty('--sc-mx', clamp01((x - r.left) / r.width).toFixed(3));
+      spots[i].style.setProperty('--sc-my', clamp01((y - r.top) / r.height).toFixed(3));
+    }
+  }
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(aim); } }
+  addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    x = e.clientX; y = e.clientY;
+    queue();
+  }, { passive: true });
+  addEventListener('scroll', queue, { passive: true });
+})();
+</script>
+
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

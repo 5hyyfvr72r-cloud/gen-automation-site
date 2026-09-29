@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+.wrangler/
+worker/.dev.vars
+scrollcraft/builds/*/lab/*.png
+
+# Not part of the public site (GitHub Pages serves every tracked file)
+scrollcraft/
+.scrollcraft.json
+IMG_0473.PNG
+worker/

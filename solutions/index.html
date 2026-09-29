@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solutions · Gen Automation</title>
+<meta name="description" content="Five systems Gen Automation builds and adapts to your business: AI outbound, speed-to-lead, quote and proposal generation, invoice generation and overdue invoice follow-up.">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/gen-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/scrollcraft.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<style>
+  .systems { padding-bottom: var(--sc-7); }
+  .sys-list { display: grid; gap: var(--sc-4); }
+  .sys { background: var(--sc-surface); border: 1px solid var(--sc-hairline); border-radius: 1.25rem; scroll-margin-top: 6rem; transition: border-color var(--sc-d-base) var(--sc-ease-out); }
+  .sys[open] { border-color: color-mix(in oklab, var(--sc-accent) 45%, transparent); }
+  .sys__row {
+    list-style: none; cursor: pointer;
+    display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto auto; align-items: center; gap: var(--sc-5);
+    padding: var(--sc-5) clamp(1.25rem, 3vw, 2rem);
+  }
+  .sys__row::-webkit-details-marker { display: none; }
+  .sys__row:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 1.25rem; }
+  .sys__n { font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-xl); color: var(--sc-accent); line-height: 1; }
+  .sys__name { display: block; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-lg); color: var(--sc-ink); line-height: 1.15; }
+  .sys__line { display: block; margin-top: var(--sc-2); color: var(--sc-ink-soft); line-height: 1.45; max-width: 62ch; }
+  .sys__metric { font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-base); color: var(--sc-ink); white-space: nowrap; text-align: right; }
+  .sys__toggle {
+    font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-sm); color: var(--sc-ink);
+    border: 1px solid var(--sc-hairline-strong); border-radius: 999px; padding: 0.45rem 0.95rem; white-space: nowrap;
+  }
+  .sys__toggle::before { content: "More info +"; }
+  .sys[open] .sys__toggle::before { content: "Close −"; }
+  .sys__row:hover .sys__toggle { border-color: var(--sc-accent); color: var(--sc-accent); }
+  @media (max-width: 760px) {
+    .sys__row { grid-template-columns: 2.2rem minmax(0, 1fr); gap: var(--sc-3) var(--sc-4); align-items: start; }
+    .sys__metric { grid-column: 2; text-align: left; }
+    .sys__toggle { grid-column: 2; justify-self: start; }
+  }
+
+  /* Open panel: the numbers first, one line of overview, the PDF for the rest. */
+  .sys__panel {
+    display: grid; grid-template-columns: minmax(0, 1fr) 13rem; gap: var(--sc-7); align-items: start;
+    padding: var(--sc-6) clamp(1.25rem, 3vw, 2rem) clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid var(--sc-hairline);
+  }
+  @media (max-width: 760px) { .sys__panel { grid-template-columns: 1fr; gap: var(--sc-6); } }
+  .nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sc-3); }
+  @media (max-width: 560px) { .nums { grid-template-columns: 1fr; } }
+  .num { background: var(--sc-canvas); border: 1px solid var(--sc-hairline); border-radius: 0.9rem; padding: var(--sc-4); }
+  .num b { display: block; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-xl); color: var(--sc-ink); line-height: 1.05; }
+  .num span { display: block; margin-top: var(--sc-2); font-size: var(--sc-t-sm); color: var(--sc-ink-soft); line-height: 1.35; }
+  .num--money b { color: var(--sc-accent); }
+  .sys__p { margin: var(--sc-5) 0 0; color: var(--sc-ink); line-height: 1.6; max-width: 62ch; }
+
+  .bp { display: block; border-radius: 0.7rem; overflow: hidden; border: 1px solid var(--sc-hairline); background: #fff; box-shadow: 0 10px 30px color-mix(in oklab, var(--sc-ink) 10%, transparent); transition: transform var(--sc-d-base) var(--sc-ease-out); }
+  .bp:hover { transform: translateY(-3px); }
+  .bp img { display: block; width: 100%; height: auto; }
+  @media (max-width: 760px) { .bp { max-width: 13rem; } }
+  .bp-link { display: inline-block; margin-top: var(--sc-3); }
+  .loom { grid-column: 1 / -1; }
+  .loom iframe { display: block; width: 100%; max-width: 48rem; aspect-ratio: 16 / 9; border: 0; border-radius: 0.8rem; background: var(--sc-ink); }
+  @media (prefers-reduced-motion: reduce) { .bp:hover { transform: none; } }
+
+  .custom { padding-block: var(--sc-7) 0; }
+  .custom__card { border: 1px dashed var(--sc-hairline-strong); border-radius: 1.25rem; padding: clamp(1.5rem, 3vw, 2.25rem); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sc-5); }
+  .custom__title { margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-lg); color: var(--sc-ink); }
+  .custom__text { margin: var(--sc-2) 0 0; color: var(--sc-ink-soft); max-width: 56ch; }
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="/">
+    <img class="site-bar__icon" src="/assets/brand/gen-icon.svg" alt="">
+    <span class="site-bar__name">Gen Automation</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a class="site-nav__link" data-nav href="/">Home</a>
+    <a class="site-nav__link" data-nav href="/solutions/">Solutions</a>
+    <a class="site-nav__link" data-nav href="/process/">Process</a>
+    <a class="site-nav__link" data-nav href="/about/">About</a>
+    <a class="site-nav__link" data-nav href="/contact/">Contact</a>
+  </nav>
+  <div class="site-bar__right">
+    <a class="site-bar__book" href="/book/">Book a call</a>
+    <button type="button" class="site-bar__menu" id="menuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="site-menu__scrim" id="siteMenuScrim"></div>
+<nav class="site-menu" id="siteMenu" aria-label="Site">
+  <ul class="site-menu__list">
+    <li><a class="site-menu__link" data-nav href="/">Home</a></li>
+    <li><a class="site-menu__link" data-nav href="/solutions/">Solutions</a></li>
+    <li><a class="site-menu__link" data-nav href="/process/">Process</a></li>
+    <li><a class="site-menu__link" data-nav href="/about/">About</a></li>
+    <li><a class="site-menu__link" data-nav href="/contact/">Contact</a></li>
+    <li><a class="site-menu__link site-menu__link--cta" data-nav href="/book/">Book a call</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+  <section class="page-head" data-sc-act="flow" data-sc-drift="#FDF8F3" data-sc-spotlight>
+    <div class="sc-wrap">
+      <p class="sc-label" data-reveal>Solutions</p>
+      <h1 class="sc-display page-head__title" data-reveal>Systems we build, adapted to your business.</h1>
+      <p class="page-head__lede" data-reveal>Real examples of what we build. Each one is adapted to your ideal clients, your processes and the tools you already use.</p>
+    </div>
+  </section>
+
+  <section class="systems" data-sc-act="flow" data-sc-drift="#FDF8F3">
+    <div class="sc-wrap">
+      <div class="sys-list">
+      <details class="sys" id="outbound" data-reveal>
+        <summary class="sys__row">
+          <span class="sys__n">01</span>
+          <span><span class="sys__name">AI Outbound System</span><span class="sys__line">Finds your ideal clients, researches each one and writes a personal email in your voice. 100 ready to send in under 20 minutes.</span></span>
+          <span class="sys__metric">~10 sec per lead</span>
+          <span class="sys__toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="sys__panel">
+          <div>
+            <div class="nums">
+              <div class="num num--money"><b>~$30K/yr</b><span>of prospecting time, at 100 prospects a week</span></div>
+              <div class="num"><b>&lt;20 min</b><span>for 100 researched, personal emails ready to send</span></div>
+              <div class="num"><b>~10 sec</b><span>per lead, vs ~7 minutes by hand</span></div>
+            </div>
+            <p class="sys__p">Targets the decision-makers who match your ideal client, researches their company, and loads a personal email for each into your campaign. You keep the final say before anything sends.</p>
+          </div>
+          <div>
+            <a class="bp" href="/assets/blueprints/outbound.pdf" target="_blank" rel="noopener" aria-label="Open the AI Outbound System blueprint (PDF)">
+              <img src="/assets/blueprints/outbound.jpg" alt="AI Outbound System blueprint, page preview" loading="lazy" width="900" height="1165">
+            </a>
+            <a class="text-link bp-link" href="/assets/blueprints/outbound.pdf" target="_blank" rel="noopener">Full blueprint (PDF) →</a>
+          </div>
+          <div class="loom" data-loom="outbound" data-title="AI Outbound System walkthrough" hidden></div>
+        </div>
+      </details>
+      <details class="sys" id="speed-to-lead" data-reveal>
+        <summary class="sys__row">
+          <span class="sys__n">02</span>
+          <span><span class="sys__name">Speed-to-Lead & Follow-Up</span><span class="sys__line">Every new inquiry is scored, researched and answered with a personal reply in about 30 seconds.</span></span>
+          <span class="sys__metric">~30 sec to a personal reply</span>
+          <span class="sys__toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="sys__panel">
+          <div>
+            <div class="nums">
+              <div class="num num--money"><b>~$10K/yr</b><span>in staff time, at 100 inquiries a month</span></div>
+              <div class="num"><b>~17 hrs/mo</b><span>of reading, research and replies handed off</span></div>
+              <div class="num"><b>~30 sec</b><span>from form to a personal reply</span></div>
+            </div>
+            <p class="sys__p">Scores each lead, researches the company and drafts a personal reply. Hot leads get a booking push and an owner alert; quiet ones get followed up automatically.</p>
+          </div>
+          <div>
+            <a class="bp" href="/assets/blueprints/speed-to-lead.pdf" target="_blank" rel="noopener" aria-label="Open the Speed-to-Lead & Follow-Up blueprint (PDF)">
+              <img src="/assets/blueprints/speed-to-lead.jpg" alt="Speed-to-Lead & Follow-Up blueprint, page preview" loading="lazy" width="900" height="1165">
+            </a>
+            <a class="text-link bp-link" href="/assets/blueprints/speed-to-lead.pdf" target="_blank" rel="noopener">Full blueprint (PDF) →</a>
+          </div>
+          <div class="loom" data-loom="speed" data-title="Speed-to-Lead & Follow-Up walkthrough" hidden></div>
+        </div>
+      </details>
+      <details class="sys" id="quotes" data-reveal>
+        <summary class="sys__row">
+          <span class="sys__n">03</span>
+          <span><span class="sys__name">Quote & Proposal Generator</span><span class="sys__line">A quote request becomes a priced, branded proposal and email, ready to send in under 20 seconds.</span></span>
+          <span class="sys__metric">&lt;20 sec per proposal</span>
+          <span class="sys__toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="sys__panel">
+          <div>
+            <div class="nums">
+              <div class="num num--money"><b>~$6K/yr</b><span>in staff time, at 20 quotes a month</span></div>
+              <div class="num"><b>~10 hrs/mo</b><span>of proposal writing handed off</span></div>
+              <div class="num"><b>&lt;20 sec</b><span>from request to a ready-to-send proposal</span></div>
+            </div>
+            <p class="sys__p">Writes the scope, prices it from your own rate card (never the AI), and builds a branded PDF with the email ready to go.</p>
+          </div>
+          <div>
+            <a class="bp" href="/assets/blueprints/quote-proposal.pdf" target="_blank" rel="noopener" aria-label="Open the Quote & Proposal Generator blueprint (PDF)">
+              <img src="/assets/blueprints/quote-proposal.jpg" alt="Quote & Proposal Generator blueprint, page preview" loading="lazy" width="900" height="1165">
+            </a>
+            <a class="text-link bp-link" href="/assets/blueprints/quote-proposal.pdf" target="_blank" rel="noopener">Full blueprint (PDF) →</a>
+          </div>
+          <div class="loom" data-loom="quote" data-title="Quote & Proposal Generator walkthrough" hidden></div>
+        </div>
+      </details>
+      <details class="sys" id="invoices" data-reveal>
+        <summary class="sys__row">
+          <span class="sys__n">04</span>
+          <span><span class="sys__name">Invoice Generator</span><span class="sys__line">The moment a job is done, a branded, correctly priced invoice goes out with a pay link and lands in your ledger.</span></span>
+          <span class="sys__metric">~10 hrs/mo back</span>
+          <span class="sys__toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="sys__panel">
+          <div>
+            <div class="nums">
+              <div class="num num--money"><b>~$6K/yr</b><span>in staff time, at 40 invoices a month</span></div>
+              <div class="num"><b>~10 hrs/mo</b><span>of invoicing handed off</span></div>
+              <div class="num"><b>Same day</b><span>invoices out when the job is done, so you get paid sooner</span></div>
+            </div>
+            <p class="sys__p">Pulls the client and line items, prices them from your rate card, and sends a branded invoice with a pay link, logged with its due date.</p>
+          </div>
+          <div>
+            <a class="bp" href="/assets/blueprints/invoice-generator.pdf" target="_blank" rel="noopener" aria-label="Open the Invoice Generator blueprint (PDF)">
+              <img src="/assets/blueprints/invoice-generator.jpg" alt="Invoice Generator blueprint, page preview" loading="lazy" width="900" height="1165">
+            </a>
+            <a class="text-link bp-link" href="/assets/blueprints/invoice-generator.pdf" target="_blank" rel="noopener">Full blueprint (PDF) →</a>
+          </div>
+        </div>
+      </details>
+      <details class="sys" id="overdue-invoices" data-reveal>
+        <summary class="sys__row">
+          <span class="sys__n">05</span>
+          <span><span class="sys__name">Overdue Invoice Follow-Up</span><span class="sys__line">Checks open invoices every morning and sends the right reminder at 7, 14, 21 and 28 days, until it’s paid.</span></span>
+          <span class="sys__metric">Hours back every month</span>
+          <span class="sys__toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="sys__panel">
+          <div>
+            <div class="nums">
+              <div class="num num--money"><b>Faster cash</b><span>every late invoice chased on time, every time</span></div>
+              <div class="num"><b>3+ hrs/mo</b><span>of checking and chasing handed off</span></div>
+              <div class="num"><b>7·14·21·28</b><span>day reminders that stop the moment it’s paid</span></div>
+            </div>
+            <p class="sys__p">Checks Stripe, QuickBooks, Xero or your sheet daily, sends the reminder that fits the stage in your tone, and flags the final notice to you.</p>
+          </div>
+          <div>
+            <a class="bp" href="/assets/blueprints/overdue-invoices.pdf" target="_blank" rel="noopener" aria-label="Open the Overdue Invoice Follow-Up blueprint (PDF)">
+              <img src="/assets/blueprints/overdue-invoices.jpg" alt="Overdue Invoice Follow-Up blueprint, page preview" loading="lazy" width="900" height="1165">
+            </a>
+            <a class="text-link bp-link" href="/assets/blueprints/overdue-invoices.pdf" target="_blank" rel="noopener">Full blueprint (PDF) →</a>
+          </div>
+        </div>
+      </details>
+      </div>
+      <div class="custom">
+        <div class="custom__card" data-reveal>
+          <div>
+            <p class="custom__title">Don’t see yours?</p>
+            <p class="custom__text">If a process can be clearly mapped, we can usually automate all or part of it. Tell us what’s eating your week on a free discovery call.</p>
+          </div>
+          <a class="text-link" href="/book/">Book a discovery call →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" data-sc-act="flow" data-sc-drift="#FDF8F3">
+    <div class="sc-wrap">
+      <div class="cta-band__card" data-reveal>
+        <h2 class="sc-display cta-band__title">Not sure which fits?</h2>
+        <p class="cta-band__lede">Tell us how your business runs today. We’ll point to the system that pays off first.</p>
+        <a class="cta" href="/book/" data-sc-magnet="0.22">Book a free 30-minute call</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="sc-wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__name">Gen Automation</p>
+        <p class="site-footer__tag">Grow the business. Without increasing the headcount.</p>
+      </div>
+      <div>
+        <p class="site-footer__h">Pages</p>
+        <ul class="site-footer__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/solutions/">Solutions</a></li>
+          <li><a href="/process/">Process</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__h">Get in touch</p>
+        <ul class="site-footer__links">
+          <li><a href="/book/">Book a call</a></li>
+          <li><a href="mailto:contact@genautomation.co">contact@genautomation.co</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="site-footer__legal">&copy; <span data-year></span> Gen Automation</p>
+  </div>
+</footer>
+
+<script src="/assets/js/scrollcraft.js"></script>
+<script>ScrollCraft.mount(document.body);</script>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

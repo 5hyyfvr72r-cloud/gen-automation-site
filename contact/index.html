@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact · Gen Automation</title>
+<meta name="description" content="Book a free 30-minute discovery call with Gen Automation, or email contact@genautomation.co.">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/gen-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/scrollcraft.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<style>
+  .contact { padding-bottom: clamp(4rem, 8vw, 7rem); }
+  .contact__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sc-6); max-width: 60rem; }
+  @media (max-width: 760px) { .contact__grid { grid-template-columns: 1fr; } }
+  .contact .card__desc { color: var(--sc-ink-soft); }
+  .contact .cta { font-size: var(--sc-t-base); padding: var(--sc-4) var(--sc-6); }
+  .contact__email { font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-base); color: var(--sc-ink); text-decoration: underline; text-decoration-color: var(--sc-accent); text-decoration-thickness: 2px; text-underline-offset: 0.22em; overflow-wrap: anywhere; }
+  .contact__email:hover { color: var(--sc-accent); }
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="/">
+    <img class="site-bar__icon" src="/assets/brand/gen-icon.svg" alt="">
+    <span class="site-bar__name">Gen Automation</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a class="site-nav__link" data-nav href="/">Home</a>
+    <a class="site-nav__link" data-nav href="/solutions/">Solutions</a>
+    <a class="site-nav__link" data-nav href="/process/">Process</a>
+    <a class="site-nav__link" data-nav href="/about/">About</a>
+    <a class="site-nav__link" data-nav href="/contact/">Contact</a>
+  </nav>
+  <div class="site-bar__right">
+    <a class="site-bar__book" href="/book/">Book a call</a>
+    <button type="button" class="site-bar__menu" id="menuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="site-menu__scrim" id="siteMenuScrim"></div>
+<nav class="site-menu" id="siteMenu" aria-label="Site">
+  <ul class="site-menu__list">
+    <li><a class="site-menu__link" data-nav href="/">Home</a></li>
+    <li><a class="site-menu__link" data-nav href="/solutions/">Solutions</a></li>
+    <li><a class="site-menu__link" data-nav href="/process/">Process</a></li>
+    <li><a class="site-menu__link" data-nav href="/about/">About</a></li>
+    <li><a class="site-menu__link" data-nav href="/contact/">Contact</a></li>
+    <li><a class="site-menu__link site-menu__link--cta" data-nav href="/book/">Book a call</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+  <section class="page-head" data-sc-act="flow" data-sc-drift="#FDF8F3" data-sc-spotlight>
+    <div class="sc-wrap">
+      <p class="sc-label" data-reveal>Contact</p>
+      <h1 class="sc-display page-head__title" data-reveal>Let’s talk about your business.</h1>
+      <p class="page-head__lede" data-reveal>The fastest way to get started is a free 30-minute call. Pick a time and you’ll get a calendar invite instantly.</p>
+    </div>
+  </section>
+
+  <section class="contact" data-sc-act="flow" data-sc-drift="#FDF8F3">
+    <div class="sc-wrap contact__grid">
+      <article class="card" data-reveal>
+        <p class="card__tag">Recommended</p>
+        <h2 class="card__title">Book a discovery call</h2>
+        <p class="card__desc">Thirty minutes on how your business runs today and where automation would help most. Free, no pitch.</p>
+        <div class="card__foot"><a class="cta" href="/book/">Pick a time</a></div>
+      </article>
+      <article class="card" data-reveal>
+        <p class="card__tag">Prefer email?</p>
+        <h2 class="card__title">Write to us</h2>
+        <p class="card__desc">Tell us a little about your business and what you’d like to fix. We reply within one business day.</p>
+        <div class="card__foot"><a class="contact__email" href="mailto:contact@genautomation.co">contact@genautomation.co</a></div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="sc-wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__name">Gen Automation</p>
+        <p class="site-footer__tag">Grow the business. Without increasing the headcount.</p>
+      </div>
+      <div>
+        <p class="site-footer__h">Pages</p>
+        <ul class="site-footer__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/solutions/">Solutions</a></li>
+          <li><a href="/process/">Process</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__h">Get in touch</p>
+        <ul class="site-footer__links">
+          <li><a href="/book/">Book a call</a></li>
+          <li><a href="mailto:contact@genautomation.co">contact@genautomation.co</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="site-footer__legal">&copy; <span data-year></span> Gen Automation</p>
+  </div>
+</footer>
+
+<script src="/assets/js/scrollcraft.js"></script>
+<script>ScrollCraft.mount(document.body);</script>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>
