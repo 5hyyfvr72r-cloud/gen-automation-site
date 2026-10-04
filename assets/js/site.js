@@ -1,4 +1,4 @@
-/* site.js: Gen Automation's shared page behavior. Load at the end of <body>,
+/* site.js: GEN Automation's shared page behavior. Load at the end of <body>,
    after scrollcraft.js (if the page uses it). Top bar state, current-page
    link, mobile drawer, footer year, scroll reveal, spotlight re-aim, demo
    links. */
