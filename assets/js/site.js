@@ -75,6 +75,7 @@
     outbound: 'https://www.loom.com/share/9621d9c0748d416da0ffc590b3ede4e3',
     speed:    'https://www.loom.com/share/4427cce2db1b4d709d308279f4154713',
     coi:      'https://www.loom.com/share/e417820b89d74d8cb47a8ef74fde5eea',
+    recruit:  'https://www.loom.com/share/22525f0593d64754a3606b917b03313f',
     quote:    'https://www.loom.com/share/8a831d1ba2e2429786664765f82ae5c6'
   };
   function embedUrl(url) { return url.replace('/share/', '/embed/').split('?')[0]; }
