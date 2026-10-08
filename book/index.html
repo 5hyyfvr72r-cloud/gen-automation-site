@@ -132,7 +132,7 @@
 
   .confirm { text-align: left; }
   .confirm__title { font-size: var(--sc-t-2xl); margin: var(--sc-4) 0 0; }
-  .confirm p.book__lede { margin-inline: 0; }
+  .confirm p.book__lede { margin-inline: 0; max-width: 64ch; }
 
 </style>
 </head>
@@ -218,7 +218,7 @@
               <label for="notes">What's on your mind? (optional)</label>
               <textarea id="notes" name="notes" maxlength="2000"></textarea>
             </div>
-            <button type="submit" class="cta book-form__submit" id="submitBtn" disabled>Select a time above</button>
+            <button type="submit" class="cta book-form__submit" id="submitBtn" disabled>Select a time</button>
             <p id="formStatus" class="book__status" role="status" aria-live="polite"></p>
           </form>
         </div>
@@ -408,7 +408,7 @@
       submitBtn.textContent = 'Book ' + shortFmt.format(new Date(selectedSlot.start)) + ' ET';
     } else {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Select a time above';
+      submitBtn.textContent = 'Select a time';
     }
   }
 
@@ -507,8 +507,11 @@
           return;
         }
         layoutEl.querySelectorAll('.book__picker, .book__form-panel').forEach(function (el) { el.hidden = true; });
+        // Glue "12:30 PM Eastern Time" together so the time never splits across lines.
+        var when = longFmt.format(new Date(selectedSlot.start))
+          .replace(/(\d{1,2}:\d{2})[\s\u202f]+(AM|PM)$/, '$1\u00a0$2') + '\u00a0Eastern\u00a0Time';
         confirmDetailEl.textContent =
-          'A calendar invite for ' + longFmt.format(new Date(selectedSlot.start)) + ' ET is on its way to ' + email + '.';
+          'A calendar invite for ' + when + ' is on its way to ' + email + '. The Google Meet link and dial-in are inside it.';
         confirmEl.hidden = false;
       })
       .catch(function () {
